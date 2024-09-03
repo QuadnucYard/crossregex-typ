@@ -40,15 +40,23 @@ If you provide answers, it will show the number of filled and total cells at bot
 #import "@preview/crossregex:0.1.0"
 
 #crossregex(
-  1,
+  3,
   constraints: (
-    `.*`,
+    `A.*`, `B.*`, `C.*`, `D.*`, `E.*`,
+    `F.*`, `G.*`, `H.*`, `I.*`, `J.*`,
+    `K.*`, `L.*`, `M.*`, `N.*`, `O.*`,
   ),
   answer: (
-    " ",
-  )
+    "ABC",
+    "DEFG",
+    "HIJKL",
+    "MNOP",
+    "QRS",
+  ),
 )
 ```
+
+Maybe triangle and square grids can be added later.
 
 ## Document
 
