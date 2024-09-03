@@ -1,0 +1,10 @@
+[package]
+name = "pavemat"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["QuadnucYard <@QuadnucYard>"]
+license = "MIT"
+description = "A crossword-like game written in Typst."
+categories = ["fun"]
+keywords = ["regex", "game", "crossword"]
+repository = "https://github.com/QuadnucYard/crossregex-typ"

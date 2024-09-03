@@ -43,4 +43,5 @@
     `[CHMNOR]*I[CHMNOR]*`,
     `(ND|ET|IN)[^X]*`,
   ),
+  show-views: false
 )
