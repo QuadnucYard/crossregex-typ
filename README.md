@@ -1,6 +1,6 @@
 # crossregex-typ
 
-A crossword-like game written in Typst. You should fill letters to satisfy regular expression constraints.
+A crossword-like game written in Typst. You should fill in letters to satisfy regular expression constraints.
 
 It takes inspiration from a web image, which derives our standard example. **I'm not the original author.**
 

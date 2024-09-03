@@ -169,12 +169,12 @@
     place(
       dx: (n1 + 0.5) * r3 * 1em,
       dy: n1 * 1.5em + 1em,
-      rotate(120deg, make-decorates(constraints.at(1), a)),
+      rotate(120deg, make-decorates(constraints.at(1), b)),
     )
     place(
       dx: (n1 + 0.5) * r3 * 1em,
       dy: n1 * 1.5em + 1em,
-      rotate(240deg, make-decorates(constraints.at(2), a)),
+      rotate(240deg, make-decorates(constraints.at(2), c)),
     )
 
     make-grid-texts(a)
