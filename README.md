@@ -30,6 +30,10 @@ We use a wasm plugin to check matching.
 
 In the hex grids, upper-case letters are colored $\color{blue}\text{blue}$, while others are colored $\color{purple}\text{purple}$. So you can use lower-case letters or symbols as hints.
 
+### Counting
+
+If you provide answers, it will show the number of filled and total cells at bottom left.
+
 ## Basic Usage
 
 ```typst

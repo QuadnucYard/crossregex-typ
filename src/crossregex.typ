@@ -31,6 +31,9 @@
   let n1 = size - 1
   let n2 = size * 2 - 1
 
+  let total = 3 * size * (size - 1) + 1
+  let filled = 0
+
   // transform constraints
   if constraints.len() != n2 * 3 {
     panic("Wrong constraint size. Expected " + str(n2 * 3) + ", received " + str(constraints.len()))
@@ -60,6 +63,12 @@
       a.at(i) += " " * (len - a.at(i).len())
     }
     a.at(i) = a.at(i).slice(0, len)
+    // count letters
+    for c in a.at(i) {
+      if c.match(regex("[A-Z]")) != none {
+        filled += 1
+      }
+    }
   }
 
   // build other views
@@ -131,6 +140,10 @@
     place(dx: (n1 + 0.5) * r3 * 1em, dy: n1 * 1.5em + 1em, make-decorates(constraints, a))
 
     make-grid-texts(a)
+
+    if answer != none {
+      place(left + bottom, text(orange)[#filled/#total])
+    }
   }
 
   let aa = (a, b, c)
@@ -165,6 +178,15 @@
     )
 
     make-grid-texts(a)
+
+    if answer != none {
+      place(
+        left + bottom,
+        dx: -margin-x * 0.66 + 0.5em,
+        dy: margin-y - 0.5em,
+        text(orange)[#filled/#total],
+      )
+    }
 
     pagebreak(weak: true)
   }
