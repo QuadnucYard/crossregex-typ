@@ -37,7 +37,7 @@ If you provide answers, it will show the number of filled and total cells at bot
 ## Basic Usage
 
 ```typst
-#import "@preview/crossregex:0.1.0"
+#import "@preview/crossregex:0.1.0": crossregex
 
 #crossregex(
   3,
@@ -56,7 +56,7 @@ If you provide answers, it will show the number of filled and total cells at bot
 )
 ```
 
-Maybe triangle and square grids can be added later.
+Maybe triangle and square grids can be added in the future.
 
 ## Document
 
