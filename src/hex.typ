@@ -2,25 +2,34 @@
 
 #let r3 = calc.sqrt(3)
 
-#let hexagon = rotate(30deg, polygon.regular(size: 2em, vertices: 6, stroke: 0.5pt))
+#let crossregex-hex(
+  size,
+  alphabet: regex("[A-Z]"),
+  constraints: (),
+  answer: none,
+  show-whole: true,
+  show-views: true,
+  cell: move(
+    dx: (1.5 - calc.sqrt(3)) * 0.5em,
+    dy: (calc.sqrt(3) - 1.5) * 0.5em,
+    rotate(30deg, polygon.regular(size: 2em, vertices: 6, stroke: 0.5pt)),
+  ),
+  cell-config: (
+    size: 1em,
+    text-style: (:),
+    valid-color: blue,
+    invalid-color: purple,
+  ),
+  margin: 0.5em,
+) = {
+  let cell-config = (
+    size: 1em,
+    text-style: (:),
+    valid-color: blue,
+    invalid-color: purple,
+  ) + cell-config
+  let s = cell-config.size
 
-#let char-box-6(ch, alphabet) = box(
-  width: r3 * 1em,
-  height: 1.5em,
-  align(center + horizon)[
-    #set text(
-      size: 1.2em,
-      fill: if ch.match(alphabet) != none {
-        blue
-      } else {
-        purple
-      },
-    )
-    #ch
-  ],
-)
-
-#let crossregex-hex(size, alphabet: auto, constraints: (), answer: none, show-whole: true, show-views: true) = {
   let n1 = size - 1
   let n2 = size * 2 - 1
 
@@ -82,9 +91,13 @@
 
   let large-hexagon = for i in range(n2) {
     for j in range(n2 - calc.abs(i - n1)) {
-      place(dx: (j + calc.abs(i - n1) * 0.5) * r3 * 1em - 0.1em, dy: i * 1.5em + 0.15em, hexagon)
+      // there is a strange offset
+      place(dx: (j + calc.abs(i - n1) * 0.5) * r3 * s, dy: i * 1.5 * s, cell)
     }
   }
+
+  let center-x = (n1 + 0.5) * r3 * s
+  let center-y = (n1 * 1.5 + 1) * s
 
   let make-decorates(constraints, a) = {
     // place constraint expressions
@@ -102,26 +115,42 @@
       }
 
       place(
-        dx: (n1 + 0.5 - calc.abs(i - n1) * 0.5) * r3 * 1em + 0.5em,
-        dy: (i - n1) * 1.5em,
+        dx: center-x + (-calc.abs(i - n1) * 0.5) * r3 * s + 0.5em,
+        dy: (i - n1) * 1.5 * s,
         move(dx: -0.2em, dy: -0.2em, circle(fill: check-result, radius: 0.2em)),
       )
       place(
-        dx: (n1 + 0.5 - calc.abs(i - n1) * 0.5) * r3 * 1em + 1.0em,
-        dy: (i - n1 - 0.3) * 1.5em,
-        box(height: 1em, align(horizon, raw(cons, lang: "re"))),
+        dx: center-x + (-calc.abs(i - n1) * 0.5) * r3 * s + 1.0em,
+        dy: (i - n1) * 1.5 * s - s * 0.5,
+        box(height: s, align(horizon, raw(cons, lang: "re"))),
       )
     }
   }
+
+  let char-box(ch) = box(
+    width: r3 * s,
+    height: 1.5 * s,
+    align(center + horizon)[
+      #set text(
+        size: 1.2em,
+        fill: if ch.match(alphabet) != none {
+          blue
+        } else {
+          purple
+        },
+      )
+      #ch
+    ],
+  )
 
   let make-grid-texts(a) = {
     // place cell texts
     for i in range(n2) {
       for j in range(n2 - calc.abs(i - n1)) {
         place(
-          dx: (j + calc.abs(i - n1) * 0.5) * r3 * 1em,
-          dy: i * 1.5em + 0.3em,
-          char-box-6(a.at(i).at(j), alphabet),
+          dx: (j + calc.abs(i - n1) * 0.5) * r3 * s,
+          dy: (i * 1.5 + 0.25) * s,
+          char-box(a.at(i).at(j)),
         )
       }
     }
@@ -130,7 +159,7 @@
   let puzzle-view(constraints, a) = {
     large-hexagon
 
-    place(dx: (n1 + 0.5) * r3 * 1em, dy: n1 * 1.5em + 1em, make-decorates(constraints, a))
+    place(dx: center-x, dy: center-y, make-decorates(constraints, a))
 
     make-grid-texts(a)
 
@@ -143,22 +172,23 @@
 
   // compose pages
   if show-whole {
-    let margin = 0.5em
-    let margin-x = max-len * 0.5em + 1em
-    let margin-y = max-len * r3 * 0.25em + 1em
+    let ext = max-len * 0.5em + 1em // extension by constrains
+    let ext-r = max-len * 0.5em + 1em
+    let ext-l = ext-r * 0.5
+    let ext-y = max-len * 0.5em * (r3 / 2) + 1em
 
     set page(
-      height: (n2 + 0.33) * 1.5em + margin-y * 2 + 1em,
-      width: (n2 + 1) * r3 * 1em + margin-x * 1.5,
-      margin: (y: margin-y, left: margin-x * 0.66, right: margin-x),
+      height: center-x * 2 + ext-y * 2 + margin * 2,
+      width: center-y * 2 + ext * 1.5 + margin * 2,
+      margin: (y: ext-y, left: ext-r * 0.66, right: ext-r),
     )
 
     large-hexagon
 
     for i in range(3) {
       place(
-        dx: (n1 + 0.5) * r3 * 1em,
-        dy: n1 * 1.5em + 1em,
+        dx: center-x,
+        dy: center-y,
         rotate(i * 120deg, make-decorates(constraints.at(i), aa.at(i))),
       )
     }
@@ -168,8 +198,8 @@
     if answer != none {
       place(
         left + bottom,
-        dx: -margin-x * 0.66 + 0.5em,
-        dy: margin-y - 0.5em,
+        dx: -ext-l * 0.66 + 0.5em,
+        dy: ext-y - 0.5em,
         text(orange)[#filled/#total],
       )
     }
@@ -178,10 +208,9 @@
   }
 
   if show-views {
-    let margin = 0.5em
     set page(
-      height: (n2 + 0.33) * 1.5em + margin * 2 + 1em,
-      width: (n2 + 1) * r3 * 1em + max-len * 0.5em + 1em,
+      height: (n2 + 0.33) * 1.5 * s + margin * 2 + 1em,
+      width: (n2 + 1) * r3 * s + max-len * 0.5em + 1em,
       margin: margin,
     )
 

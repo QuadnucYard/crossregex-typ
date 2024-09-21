@@ -1,9 +1,8 @@
-#import "../src/lib.typ": crossregex
+#import "../src/lib.typ": crossregex-square
 
-#crossregex(
+#crossregex-square(
   9,
-  shape: "square",
-  alphabet: "[0-9]",
+  alphabet: regex("[0-9]"),
   constraints: (
     `.*`,
     `.*`,
@@ -35,4 +34,10 @@
     "783649215",
     "659128743",
   ),
+  cell: move(
+    dx: 0.1em,
+    dy: 0.1em,
+    rect(width: 1.4em, height: 1.4em, radius: 0.1em, stroke: 1pt + orange, fill: orange.transparentize(80%)),
+  ),
+  cell-config: (size: 1.6em, text-style: (size: 1.6em)),
 )

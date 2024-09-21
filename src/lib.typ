@@ -1,3 +1,6 @@
+#import "hex.typ": crossregex-hex
+#import "square.typ": crossregex-square
+
 /// Make a wonderful crossregex game.
 ///
 /// - size (int): the size of the grids, namely the number of cells on the edge.
@@ -20,7 +23,6 @@
     regex(alphabet)
   }
   if shape == "hex" {
-    import "hex.typ": crossregex-hex
     crossregex-hex(
       size,
       alphabet: alphabet,
@@ -30,7 +32,6 @@
       show-views: show-views,
     )
   } else if shape == "square" {
-    import "square.typ": crossregex-square
     crossregex-square(
       size,
       alphabet: alphabet,

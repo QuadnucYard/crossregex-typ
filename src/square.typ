@@ -1,24 +1,29 @@
 #import "regex.typ": regex-match
 
-#let square = polygon.regular(size: calc.sqrt(2) * 1em, vertices: 4, stroke: 0.5pt)
+#let crossregex-square(
+  size,
+  alphabet: regex("[A-Z]"),
+  constraints: (),
+  answer: none,
+  show-whole: true,
+  show-views: true,
+  cell: polygon.regular(size: calc.sqrt(2) * 1em, vertices: 4, stroke: 0.5pt),
+  cell-config: (
+    size: 1em,
+    text-style: (:),
+    valid-color: blue,
+    invalid-color: purple,
+  ),
+  margin: 0.5em,
+) = {
+  let cell-config = (
+    size: 1em,
+    text-style: (:),
+    valid-color: blue,
+    invalid-color: purple,
+  ) + cell-config
+  let s = cell-config.size
 
-#let char-box-4(ch, alphabet) = box(
-  width: 1em,
-  height: 1em,
-  align(center + horizon)[
-    #set text(
-      size: 1em,
-      fill: if ch.match(alphabet) != none {
-        blue
-      } else {
-        purple
-      },
-    )
-    #ch
-  ],
-)
-
-#let crossregex-square(size, alphabet: auto, constraints: (), answer: none, show-whole: true, show-views: true) = {
   let n = size
   let total = n * n
   let filled = 0
@@ -70,7 +75,7 @@
 
   let large-square = for i in range(n) {
     for j in range(n) {
-      place(dx: j * 1em, dy: i * 1em, square)
+      place(dx: j * s, dy: i * s, cell)
     }
   }
 
@@ -90,26 +95,42 @@
       }
 
       place(
-        dx: n * 0.5 * 1em + 0.5em,
-        dy: (i - n * 0.5 + 0.5) * 1em,
+        dx: n * 0.5 * s + 0.5em,
+        dy: (i - n * 0.5 + 0.5) * s,
         move(dx: -0.2em, dy: -0.2em, circle(fill: check-result, radius: 0.2em)),
       )
       place(
-        dx: n * 0.5 * 1em + 1.0em,
-        dy: (i - n * 0.5) * 1em,
-        box(height: 1em, align(horizon, raw(cons, lang: "re"))),
+        dx: n * 0.5 * s + 1.0em,
+        dy: (i - n * 0.5) * s,
+        box(height: s, align(horizon, raw(cons, lang: "re"))),
       )
     }
   }
+
+  let char-box(ch) = box(
+    width: s,
+    height: s,
+    align(center + horizon)[
+      #set text(
+        ..cell-config.text-style,
+        fill: if ch.match(alphabet) != none {
+          cell-config.valid-color
+        } else {
+          cell-config.invalid-color
+        },
+      )
+      #ch
+    ],
+  )
 
   let make-grid-texts(a) = {
     // place cell texts
     for i in range(n) {
       for j in range(n) {
         place(
-          dx: j * 1em,
-          dy: i * 1em,
-          char-box-4(a.at(i).at(j), alphabet),
+          dx: j * s,
+          dy: i * s,
+          char-box(a.at(i).at(j)),
         )
       }
     }
@@ -118,7 +139,7 @@
   let puzzle-view(constraints, a) = {
     large-square
 
-    place(dx: n * 0.5 * 1em, dy: n * 0.5 * 1em, make-decorates(constraints, a))
+    place(dx: n * 0.5 * s, dy: n * 0.5 * s, make-decorates(constraints, a))
 
     make-grid-texts(a)
 
@@ -131,13 +152,11 @@
 
   // compose pages
   if show-whole {
-    let margin = 0.5em
-    let margin-x = max-len * 0.5em + 1em + margin
-    let margin-y = max-len * 0.5em + 1em + margin + 1em
+    let ext = max-len * 0.5em + 1em // extension by constrains
 
     set page(
-      height: n * 1em + (margin + margin-y),
-      width: n * 1em + (margin + margin-x),
+      height: n * s + ext + margin * 2,
+      width: n * s + (ext + 1em) + margin * 2,
       margin: margin,
     )
 
@@ -145,8 +164,8 @@
 
     for i in range(2) {
       place(
-        dx: n * 0.5 * 1em,
-        dy: n * 0.5 * 1em,
+        dx: n * 0.5 * s,
+        dy: n * 0.5 * s,
         rotate(i * 90deg, make-decorates(constraints.at(i), aa.at(i))),
       )
     }
@@ -164,10 +183,9 @@
   }
 
   if show-views {
-    let margin = 0.5em
     set page(
-      height: (n + 1) * 1em + margin * 2,
-      width: (n + 1) * 1em + max-len * 0.5em + margin * 2,
+      height: n * s + margin * 2 + 1em,
+      width: n * s + max-len * 0.5em + 1em + margin * 2,
       margin: margin,
     )
 
