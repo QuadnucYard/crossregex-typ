@@ -1,4 +1,4 @@
-#import "../src/crossregex.typ": crossregex
+#import "../src/lib.typ": crossregex
 
 #crossregex(
   7,

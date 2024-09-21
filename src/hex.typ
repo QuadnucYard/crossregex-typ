@@ -4,13 +4,13 @@
 
 #let hexagon = rotate(30deg, polygon.regular(size: 2em, vertices: 6, stroke: 0.5pt))
 
-#let char-box(ch) = box(
+#let char-box-6(ch, alphabet) = box(
   width: r3 * 1em,
   height: 1.5em,
   align(center + horizon)[
     #set text(
       size: 1.2em,
-      fill: if ch.match(regex("[A-Z]")) != none {
+      fill: if ch.match(alphabet) != none {
         blue
       } else {
         purple
@@ -20,14 +20,7 @@
   ],
 )
 
-/// Make a wonderful crossregex game.
-///
-/// - size (int): the size of the grids, namely the number of cells on the edge.
-/// - constraints (array): All constraint regular expressions, given in clockwise order.
-/// - answer (none, array, content): Your answers, either a multi-line raw block or an array of strings. The character in one cell is represented as a char in the string.
-/// - show-whole (bool): Whether to show all constraints in one page.
-/// - show-views (bool): Whether to show three views separately.
-#let crossregex(size, constraints: (), answer: none, show-whole: true, show-views: true) = {
+#let crossregex-hex(size, alphabet: auto, constraints: (), answer: none, show-whole: true, show-views: true) = {
   let n1 = size - 1
   let n2 = size * 2 - 1
 
@@ -65,7 +58,7 @@
     a.at(i) = a.at(i).slice(0, len)
     // count letters
     for c in a.at(i) {
-      if c.match(regex("[A-Z]")) != none {
+      if c.match(alphabet) != none {
         filled += 1
       }
     }
@@ -98,7 +91,7 @@
     show raw.where(block: false): box.with(fill: gray.transparentize(90%), outset: (x: 0.1em, y: 0.2em), radius: 0.2em)
 
     for (i, cons) in constraints.enumerate() {
-      let check-result = if regex-match("^" + cons + "$", a.at(i).replace(regex("[^A-Z]"), " ")) {
+      let check-result = if regex-match("^" + cons + "$", a.at(i)) {
         if a.at(i).contains(" ") {
           yellow
         } else {
@@ -128,7 +121,7 @@
         place(
           dx: (j + calc.abs(i - n1) * 0.5) * r3 * 1em,
           dy: i * 1.5em + 0.3em,
-          char-box(a.at(i).at(j)),
+          char-box-6(a.at(i).at(j), alphabet),
         )
       }
     }
@@ -150,32 +143,25 @@
 
   // compose pages
   if show-whole {
+    let margin = 0.5em
     let margin-x = max-len * 0.5em + 1em
     let margin-y = max-len * r3 * 0.25em + 1em
 
     set page(
-      height: (n2 + 0.33) * 1.5em + margin-y * 2,
+      height: (n2 + 0.33) * 1.5em + margin-y * 2 + 1em,
       width: (n2 + 1) * r3 * 1em + margin-x * 1.5,
       margin: (y: margin-y, left: margin-x * 0.66, right: margin-x),
     )
 
     large-hexagon
 
-    place(
-      dx: (n1 + 0.5) * r3 * 1em,
-      dy: n1 * 1.5em + 1em,
-      make-decorates(constraints.at(0), a),
-    )
-    place(
-      dx: (n1 + 0.5) * r3 * 1em,
-      dy: n1 * 1.5em + 1em,
-      rotate(120deg, make-decorates(constraints.at(1), b)),
-    )
-    place(
-      dx: (n1 + 0.5) * r3 * 1em,
-      dy: n1 * 1.5em + 1em,
-      rotate(240deg, make-decorates(constraints.at(2), c)),
-    )
+    for i in range(3) {
+      place(
+        dx: (n1 + 0.5) * r3 * 1em,
+        dy: n1 * 1.5em + 1em,
+        rotate(i * 120deg, make-decorates(constraints.at(i), aa.at(i))),
+      )
+    }
 
     make-grid-texts(a)
 
@@ -194,7 +180,7 @@
   if show-views {
     let margin = 0.5em
     set page(
-      height: (n2 + 0.33) * 1.5em + margin * 2,
+      height: (n2 + 0.33) * 1.5em + margin * 2 + 1em,
       width: (n2 + 1) * r3 * 1em + max-len * 0.5em + 1em,
       margin: margin,
     )
