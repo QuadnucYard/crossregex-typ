@@ -1,6 +1,11 @@
+#let make-progress(filled, total) = {
+  text(orange)[#filled/#total]
+}
+
 #let process-args(
   rows: none,
   row-len: none,
+  total: none,
   constraints: none,
   constraint-size: none,
   answer: none,
@@ -62,5 +67,10 @@
     },
   )
 
-  (constraints: constraints, max-len: max-len, answer: answer, filled: filled, a: a, aa: aa)
+
+  let progress = if answer != none {
+    make-progress(filled, total)
+  }
+
+  (constraints: constraints, max-len: max-len, answer: answer, filled: filled, a: a, aa: aa, progress: progress)
 }

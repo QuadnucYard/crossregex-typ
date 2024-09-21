@@ -35,9 +35,10 @@
   let n2 = size * 2 - 1
   let total = 3 * size * (size - 1) + 1
 
-  let (constraints, max-len, answer, filled, a, aa) = process-args(
+  let (constraints, max-len, answer, filled, a, aa, progress) = process-args(
     rows: n2,
     row-len: i => n2 - calc.abs(i - n1),
+    total: 3 * size * (size - 1) + 1,
     constraints: constraints,
     constraint-size: n2 * 3,
     answer: answer,
@@ -48,79 +49,37 @@
     ),
   )
 
-  let large-hexagon = for i in range(n2) {
-    for j in range(n2 - calc.abs(i - n1)) {
-      // there is a strange offset
-      place(dx: (j + calc.abs(i - n1) * 0.5) * r3 * s, dy: i * 1.5 * s, cell)
-    }
-  }
-
   let center = (x: (n1 + 0.5) * r3 * s, y: (n1 * 1.5 + 1) * s)
   let ext = max-len * 0.5em + 1em // extension by constrains
 
-  let make-decorates = decoration-builder(
-    i => {
-      (x: center.x + -calc.abs(i - n1) * 0.5 * r3 * s, y: (i - n1) * 1.5 * s)
-    },
-    s,
+  let (puzzle-whole, puzzle-view) = build-layout(
+    angle: 120deg,
+    rows: n2,
+    row-len: i => n2 - calc.abs(i - n1),
+    cell: cell,
+    cell-size: s,
+    cell-config: cell-config,
+    alphabet: alphabet,
+    cell-positioner: (i, j) => ((j + calc.abs(i - n1) * 0.5) * r3 * s, i * 1.5 * s),
+    cell-text-offset: (0em, 0.25 * s),
+    char-box-size: (r3 * s, 1.5 * s),
+    deco-positioner: i => (center.x + -calc.abs(i - n1) * 0.5 * r3 * s, (i - n1) * 1.5 * s),
+    center: center,
+    num-views: 3,
+    view-size: (center.x * 2 + ext, center.y * 2),
+    whole-size: (center.x * 2 + ext * 1.5, center.y * 2 + ext * r3),
+    whole-grid-offset: (ext * 0.5, ext * r3 / 2),
   )
-
-  let char-box = char-box-builder(r3 * s, 1.5 * s, cell-config, alphabet)
-
-  let make-grid-texts(a) = {
-    // place cell texts
-    for i in range(n2) {
-      for j in range(n2 - calc.abs(i - n1)) {
-        place(
-          dx: (j + calc.abs(i - n1) * 0.5) * r3 * s,
-          dy: (i * 1.5 + 0.25) * s,
-          char-box(a.at(i).at(j)),
-        )
-      }
-    }
-  }
-
-  let puzzle-view(constraints, a) = {
-    show: block.with(width: center.x * 2 + ext, height: center.y * 2)
-
-    large-hexagon
-
-    place(dx: center.x, dy: center.y, make-decorates(constraints, a))
-
-    make-grid-texts(a)
-  }
-
-  let puzzle-whole = {
-    show: block.with(width: center.x * 2 + ext * 1.5, height: center.y * 2 + ext * r3)
-
-    show: move.with(dx: ext * 0.5, dy: ext * r3 / 2)
-
-    large-hexagon
-
-    for i in range(3) {
-      place(
-        dx: center.x,
-        dy: center.y,
-        rotate(i * 120deg, make-decorates(constraints.at(i), aa.at(i))),
-      )
-    }
-
-    make-grid-texts(a)
-  }
-
-  let prog = if answer != none {
-    make-progress(filled, total)
-  }
 
   doc-layout(
     whole-maker: if show-whole {
-      () => puzzle-whole
+      () => puzzle-whole(constraints, aa)
     },
     view-maker: if show-views {
       k => puzzle-view(constraints.at(k), aa.at(k))
     },
     num-views: 3,
-    progress: prog,
+    progress: progress,
     margin: margin,
   )
 }

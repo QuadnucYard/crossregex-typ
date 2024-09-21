@@ -28,9 +28,10 @@
   let n = size
   let total = n * n
 
-  let (constraints, max-len, answer, filled, a, aa) = process-args(
+  let (constraints, max-len, answer, a, aa, progress) = process-args(
     rows: n,
     row-len: i => n,
+    total: n * n,
     constraints: constraints,
     constraint-size: n * 2,
     answer: answer,
@@ -38,76 +39,36 @@
     rotators: ((i, j) => (j, n - i - 1),),
   )
 
-  let large-square = for i in range(n) {
-    for j in range(n) {
-      place(dx: j * s, dy: i * s, cell)
-    }
-  }
-
   let center = (x: n * 0.5 * s, y: n * 0.5 * s)
   let ext = max-len * 0.5em + 1em // extension by constrains
 
-  let make-decorates = decoration-builder(
-    i => {
-      (x: center.x, y: (i - n * 0.5 + 0.5) * s)
-    },
-    s,
+  let (puzzle-whole, puzzle-view) = build-layout(
+    angle: 90deg,
+    rows: n,
+    row-len: _ => n,
+    cell: cell,
+    cell-size: s,
+    cell-config: cell-config,
+    alphabet: alphabet,
+    cell-positioner: (i, j) => (j * s, i * s),
+    cell-text-offset: (0em, 0em),
+    char-box-size: (s, s),
+    deco-positioner: i => (center.x, (i - n * 0.5 + 0.5) * s),
+    center: center,
+    num-views: 2,
+    view-size: (n * s + ext, n * s),
+    whole-size: (center.x * 2 + ext, center.y * 2 + ext),
   )
-
-  let char-box = char-box-builder(s, s, cell-config, alphabet)
-
-  let make-grid-texts(a) = {
-    // place cell texts
-    for i in range(n) {
-      for j in range(n) {
-        place(
-          dx: j * s,
-          dy: i * s,
-          char-box(a.at(i).at(j)),
-        )
-      }
-    }
-  }
-
-  let puzzle-view(constraints, a) = {
-    show: block.with(width: n * s + ext, height: n * s)
-
-    large-square
-
-    place(dx: center.x, dy: center.y, make-decorates(constraints, a))
-
-    make-grid-texts(a)
-  }
-
-  let puzzle-whole = {
-    show: block.with(width: center.x * 2 + ext, height: center.y * 2 + ext)
-
-    large-square
-
-    for i in range(2) {
-      place(
-        dx: center.x,
-        dy: center.y,
-        rotate(i * 90deg, make-decorates(constraints.at(i), aa.at(i))),
-      )
-    }
-
-    make-grid-texts(a)
-  }
-
-  let prog = if answer != none {
-    make-progress(filled, total)
-  }
 
   doc-layout(
     whole-maker: if show-whole {
-      () => puzzle-whole
+      () => puzzle-whole(constraints, aa)
     },
     view-maker: if show-views {
       k => puzzle-view(constraints.at(k), aa.at(k))
     },
     num-views: 2,
-    progress: prog,
+    progress: progress,
     margin: margin,
   )
 }
