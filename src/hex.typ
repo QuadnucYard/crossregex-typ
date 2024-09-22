@@ -17,11 +17,7 @@
   page-margin: 0.5em,
 ) = {
   if cell == auto {
-    cell = move(
-      dx: (1.5 - calc.sqrt(3)) * 0.5em,
-      dy: (calc.sqrt(3) - 1.5) * 0.5em,
-      rotate(30deg, polygon.regular(size: 2em, vertices: 6, stroke: 0.5pt)),
-    )
+    cell = rotate(30deg, polygon.regular(size: 2em, vertices: 6, stroke: 0.5pt), origin: center)
   }
   let cell-config = (size: 1em) + cell-config
 
@@ -57,8 +53,7 @@
     cell-size: s,
     cell-config: cell-config,
     alphabet: alphabet,
-    cell-pos: (i, j) => ((j + calc.abs(i - n1) * 0.5) * r3 * s, i * 1.5 * s),
-    cell-text-offset: (0em, 0.25 * s),
+    cell-pos: (i, j) => ((j + calc.abs(i - n1) * 0.5 + 0.5) * r3 * s, (i * 1.5 + 1.0) * s),
     char-box-size: (r3 * s, 1.5 * s),
     deco-pos: i => (center.x + -calc.abs(i - n1) * 0.5 * r3 * s, (i - n1) * 1.5 * s),
     deco-config: deco-config,

@@ -8,21 +8,17 @@
 }
 
 #let build-char-box(width, height, cell-config, alphabet) = {
-  ch => box(
-    width: width,
-    height: height,
-    align(center + horizon)[
-      #set text(
-        ..cell-config.text-style,
-        fill: if ch.match(alphabet) != none {
-          cell-config.valid-color
-        } else {
-          cell-config.invalid-color
-        },
-      )
-      #ch
-    ],
-  )
+  ch => {
+    set text(
+      ..cell-config.text-style,
+      fill: if ch.match(alphabet) != none {
+        cell-config.valid-color
+      } else {
+        cell-config.invalid-color
+      },
+    )
+    ch
+  }
 }
 
 #let build-decoration(positioner, height, deco-config) = {
@@ -89,7 +85,6 @@
   cell-config: none,
   alphabet: none,
   cell-pos: none,
-  cell-text-offset: none,
   char-box-size: none,
   deco-pos: none,
   deco-config: none,
@@ -114,7 +109,7 @@
   let large-shape = for i in range(rows) {
     for j in range(row-len(i)) {
       let (x, y) = cell-pos(i, j)
-      place(dx: x, dy: y, cell)
+      place(dx: x, dy: y, centered(cell))
     }
   }
 
@@ -129,12 +124,7 @@
     for i in range(rows) {
       for j in range(row-len(i)) {
         let (x, y) = cell-pos(i, j)
-        let (ox, oy) = cell-text-offset
-        place(
-          dx: x + ox,
-          dy: y + oy,
-          char-box(a.at(i).at(j)),
-        )
+        place(dx: x, dy: y, centered(char-box(a.at(i).at(j))))
       }
     }
   }
