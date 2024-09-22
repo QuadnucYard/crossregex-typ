@@ -1,6 +1,6 @@
-#import "../src/lib.typ": crossregex
+#import "../src/lib.typ": crossregex-hex
 
-#crossregex(
+#crossregex-hex(
   3,
   constraints: (
     `A.*`,

@@ -1,7 +1,3 @@
-#let make-progress(filled, total) = {
-  text(orange)[#filled/#total]
-}
-
 #let process-args(
   rows: none,
   row-len: none,
@@ -11,6 +7,7 @@
   answer: none,
   alphabet: none,
   rotators: (),
+  progress-creator: auto,
 ) = {
   // transform constraints
   if constraints.len() != constraint-size {
@@ -67,9 +64,11 @@
     },
   )
 
-
-  let progress = if answer != none {
-    make-progress(filled, total)
+  if progress-creator == auto {
+    progress-creator = (filled, total) => text(orange)[#filled/#total]
+  }
+  let progress = if progress-creator != none and answer != none {
+    progress-creator(filled, total)
   }
 
   (constraints: constraints, max-len: max-len, answer: answer, filled: filled, a: a, aa: aa, progress: progress)

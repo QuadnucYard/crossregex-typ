@@ -1,5 +1,12 @@
 #import "regex.typ": regex-match
 
+#let centered(body) = {
+  context {
+    let size = measure(body)
+    move(dx: -size.width / 2, dy: -size.height / 2, body)
+  }
+}
+
 #let build-char-box(width, height, cell-config, alphabet) = {
   ch => box(
     width: width,
@@ -18,30 +25,54 @@
   )
 }
 
-#let build-decoration(positioner, height) = {
+#let build-decoration(positioner, height, deco-config) = {
+  let hint-marker = if deco-config.hint-marker == auto {
+    r => circle(
+      radius: 0.2em,
+      fill: if r == none {
+        yellow
+      } else if r {
+        green
+      } else {
+        red
+      },
+    )
+  } else {
+    deco-config.hint-marker
+  }
+  let regex-box = if deco-config.regex-style == auto {
+    box.with(fill: gray.transparentize(90%), outset: (x: 0.1em, y: 0.2em), radius: 0.2em)
+  } else {
+    deco-config.regex-style
+  }
+
   (constraints, a) => {
-    // place constraint expressions
-    show raw.where(block: false): box.with(fill: gray.transparentize(90%), outset: (x: 0.1em, y: 0.2em), radius: 0.2em)
+    show raw.where(block: false): regex-box
 
     for (i, cons) in constraints.enumerate() {
       let check-result = if regex-match("^" + cons + "$", a.at(i)) {
+        // FIXME - invalid char
         if a.at(i).contains(" ") {
-          yellow
+          none
         } else {
-          green
+          true
         }
       } else {
-        red
+        false
       }
 
       let (x, y) = positioner(i)
+      if hint-marker != none {
+        place(
+          dx: x + deco-config.hint-offset,
+          dy: y,
+          centered(hint-marker(check-result)),
+        )
+      }
+
+      // place constraint expressions
       place(
-        dx: x + 0.5em,
-        dy: y,
-        move(dx: -0.2em, dy: -0.2em, circle(fill: check-result, radius: 0.2em)),
-      )
-      place(
-        dx: x + 1.0em,
+        dx: x + deco-config.regex-offset,
         dy: y - height * 0.5,
         box(height: height, align(horizon, raw(cons, lang: "re"))),
       )
@@ -57,26 +88,37 @@
   cell-size: none,
   cell-config: none,
   alphabet: none,
-  cell-positioner: none,
+  cell-pos: none,
   cell-text-offset: none,
   char-box-size: none,
-  deco-positioner: none,
+  deco-pos: none,
+  deco-config: none,
   center: none,
   num-views: none,
   view-size: none,
   whole-size: none,
   whole-grid-offset: (0em, 0em),
 ) = {
+  let cell-config = (
+    text-style: (:),
+    valid-color: blue,
+    invalid-color: purple,
+  ) + cell-config
+  let deco-config = (
+    hint-offset: 0.5em,
+    hint-marker: auto,
+    regex-offset: 1.0em,
+    regex-style: auto,
+  ) + deco-config
 
   let large-shape = for i in range(rows) {
     for j in range(row-len(i)) {
-      let (x, y) = cell-positioner(i, j)
+      let (x, y) = cell-pos(i, j)
       place(dx: x, dy: y, cell)
     }
   }
 
-
-  let make-decorates = build-decoration(deco-positioner, cell-size)
+  let make-decorates = build-decoration(deco-pos, cell-size, deco-config)
 
   let char-box = build-char-box(..char-box-size, cell-config, alphabet)
 
@@ -86,7 +128,7 @@
     // place cell texts
     for i in range(rows) {
       for j in range(row-len(i)) {
-        let (x, y) = cell-positioner(i, j)
+        let (x, y) = cell-pos(i, j)
         let (ox, oy) = cell-text-offset
         place(
           dx: x + ox,
@@ -104,7 +146,6 @@
     make-grid(a)
 
     place(dx: center.x, dy: center.y, make-decorates(constraints, a))
-
   }
 
   let puzzle-whole(constraints, aa) = {

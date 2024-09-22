@@ -10,25 +10,21 @@
   answer: none,
   show-whole: true,
   show-views: true,
-  cell: move(
-    dx: (1.5 - calc.sqrt(3)) * 0.5em,
-    dy: (calc.sqrt(3) - 1.5) * 0.5em,
-    rotate(30deg, polygon.regular(size: 2em, vertices: 6, stroke: 0.5pt)),
-  ),
-  cell-config: (
-    size: 1em,
-    text-style: (:),
-    valid-color: blue,
-    invalid-color: purple,
-  ),
-  margin: 0.5em,
+  cell: auto,
+  cell-config: (:),
+  deco-config: (:),
+  progress-creator: auto,
+  page-margin: 0.5em,
 ) = {
-  let cell-config = (
-    size: 1em,
-    text-style: (:),
-    valid-color: blue,
-    invalid-color: purple,
-  ) + cell-config
+  if cell == auto {
+    cell = move(
+      dx: (1.5 - calc.sqrt(3)) * 0.5em,
+      dy: (calc.sqrt(3) - 1.5) * 0.5em,
+      rotate(30deg, polygon.regular(size: 2em, vertices: 6, stroke: 0.5pt)),
+    )
+  }
+  let cell-config = (size: 1em) + cell-config
+
   let s = cell-config.size
 
   let n1 = size - 1
@@ -47,6 +43,7 @@
       (i, j) => (n2 - 1 - j - calc.max(i - n1, 0), calc.min(calc.min(i + n1, n2 - 1) - j, i)),
       ((i, j) => (calc.max(n1 - i, 0) + j, calc.min(n2 - 1 - calc.max(i - n1, 0) - j, n2 - i - 1))),
     ),
+    progress-creator: progress-creator,
   )
 
   let center = (x: (n1 + 0.5) * r3 * s, y: (n1 * 1.5 + 1) * s)
@@ -60,10 +57,11 @@
     cell-size: s,
     cell-config: cell-config,
     alphabet: alphabet,
-    cell-positioner: (i, j) => ((j + calc.abs(i - n1) * 0.5) * r3 * s, i * 1.5 * s),
+    cell-pos: (i, j) => ((j + calc.abs(i - n1) * 0.5) * r3 * s, i * 1.5 * s),
     cell-text-offset: (0em, 0.25 * s),
     char-box-size: (r3 * s, 1.5 * s),
-    deco-positioner: i => (center.x + -calc.abs(i - n1) * 0.5 * r3 * s, (i - n1) * 1.5 * s),
+    deco-pos: i => (center.x + -calc.abs(i - n1) * 0.5 * r3 * s, (i - n1) * 1.5 * s),
+    deco-config: deco-config,
     center: center,
     num-views: 3,
     view-size: (center.x * 2 + ext, center.y * 2),
@@ -80,6 +78,6 @@
     },
     num-views: 3,
     progress: progress,
-    margin: margin,
+    margin: page-margin,
   )
 }

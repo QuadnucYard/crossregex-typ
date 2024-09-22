@@ -8,21 +8,17 @@
   answer: none,
   show-whole: true,
   show-views: true,
-  cell: polygon.regular(size: calc.sqrt(2) * 1em, vertices: 4, stroke: 0.5pt),
-  cell-config: (
-    size: 1em,
-    text-style: (:),
-    valid-color: blue,
-    invalid-color: purple,
-  ),
-  margin: 0.5em,
+  cell: auto,
+  cell-config: (:),
+  deco-config: (:),
+  progress-creator: auto,
+  page-margin: 0.5em,
 ) = {
-  let cell-config = (
-    size: 1em,
-    text-style: (:),
-    valid-color: blue,
-    invalid-color: purple,
-  ) + cell-config
+  if cell == auto {
+    cell = polygon.regular(size: calc.sqrt(2) * 1em, vertices: 4, stroke: 0.5pt)
+  }
+  let cell-config = (size: 1em) + cell-config
+
   let s = cell-config.size
 
   let n = size
@@ -37,6 +33,7 @@
     answer: answer,
     alphabet: alphabet,
     rotators: ((i, j) => (j, n - i - 1),),
+    progress-creator: progress-creator,
   )
 
   let center = (x: n * 0.5 * s, y: n * 0.5 * s)
@@ -50,10 +47,11 @@
     cell-size: s,
     cell-config: cell-config,
     alphabet: alphabet,
-    cell-positioner: (i, j) => (j * s, i * s),
+    cell-pos: (i, j) => (j * s, i * s),
     cell-text-offset: (0em, 0em),
     char-box-size: (s, s),
-    deco-positioner: i => (center.x, (i - n * 0.5 + 0.5) * s),
+    deco-pos: i => (center.x, (i - n * 0.5 + 0.5) * s),
+    deco-config: deco-config,
     center: center,
     num-views: 2,
     view-size: (n * s + ext, n * s),
@@ -69,6 +67,6 @@
     },
     num-views: 2,
     progress: progress,
-    margin: margin,
+    margin: page-margin,
   )
 }
