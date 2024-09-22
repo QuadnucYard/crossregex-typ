@@ -21,7 +21,7 @@
   }
 }
 
-#let build-decoration(positioner, height, deco-config) = {
+#let build-decoration(positioner, height, deco-config, alphabet) = {
   let hint-marker = if deco-config.hint-marker == auto {
     r => circle(
       radius: 0.2em,
@@ -47,11 +47,10 @@
 
     for (i, cons) in constraints.enumerate() {
       let check-result = if regex-match("^" + cons + "$", a.at(i)) {
-        // FIXME - invalid char
-        if a.at(i).contains(" ") {
-          none
-        } else {
+        if a.at(i).clusters().all(x => x.match(alphabet) != none) {
           true
+        } else {
+          none
         }
       } else {
         false
@@ -113,7 +112,7 @@
     }
   }
 
-  let make-decorates = build-decoration(deco-pos, cell-size, deco-config)
+  let make-decorates = build-decoration(deco-pos, cell-size, deco-config, alphabet)
 
   let char-box = build-char-box(..char-box-size, cell-config, alphabet)
 
