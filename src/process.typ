@@ -30,7 +30,7 @@
     answer.text.split("\n")
   }
   if a.len() < rows {
-    a += ("",) * (size - a.len())
+    a += ("",) * (rows - a.len())
   }
 
   let filled = 0
